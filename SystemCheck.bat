@@ -20,7 +20,7 @@ echo   Windows Systemprüfung
 echo =============================
 echo.
 
-echo [1/4] DISM: CheckHealth wird ausgefuehrt...
+echo [1/4] DISM: CheckHealth wird ausgeführt...
 Dism /Online /Cleanup-Image /CheckHealth >> %LOG% 2>&1
 if %errorlevel% neq 0 (
     echo Fehler bei CheckHealth. Details siehe %LOG%.
