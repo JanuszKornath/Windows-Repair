@@ -1,10 +1,11 @@
 @echo off
+pushd %~dp0
 chcp 1252 >nul
 title Systemüberprüfung mit DISM und SFC
 color 1F
 
-:: Admin-Rechte prüfen
-net session >nul 2>&1
+:: Admin-Rechte prüfen (zuverlässig)
+fltmc >nul 2>&1
 if %errorlevel% neq 0 (
     echo [FEHLER] Bitte als Administrator ausfuehren!
     pause
