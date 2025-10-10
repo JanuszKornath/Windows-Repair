@@ -1,6 +1,13 @@
-# Einheitliche Textcodierung und Zeilenenden
-* text=auto eol=lf
+# Standard: Textdateien normalisieren, Windows-Zeilenenden
+* text=auto eol=crlf
 
-# Batch-Dateien immer als UTF-8 ohne BOM behandeln
-*.bat text working-tree-encoding=UTF-8
-*.cmd text working-tree-encoding=UTF-8
+# Batch-Dateien explizit in Windows-1252 (ANSI)
+*.bat text eol=crlf working-tree-encoding=Windows-1252
+*.cmd text eol=crlf working-tree-encoding=Windows-1252
+
+# PowerShell-Skripte dürfen UTF-8 sein (PowerShell versteht das)
+*.ps1 text eol=crlf working-tree-encoding=UTF-8
+
+# Log- und Textdateien: einfach CRLF, Standard-Encoding
+*.log text eol=crlf
+*.txt text eol=crlf

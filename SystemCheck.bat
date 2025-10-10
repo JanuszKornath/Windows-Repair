@@ -1,22 +1,22 @@
 @echo off
-chcp 65001 >nul
-pushd %~dp0
-title Systemüberprüfung mit DISM und SFC
+chcp 1252 >nul
+cd /d "%~dp0"
+title Systempruefung mit DISM und SFC
 color 1F
 
-:: Funktion für erklärende Pause
+:: Funktion fuer erklaerende Pause
 :PauseMitText
 echo %~1
 pause >nul
 goto :eof
 
-:: Admin-Rechte prüfen
+:: Admin-Rechte pruefen
 fltmc >nul 2>&1
 if %errorlevel% neq 0 (
     color 0C
-    echo [FEHLER] Bitte als Administrator ausführen!
+    echo [FEHLER] Bitte als Administrator ausfuehren!
     color 1F
-    call :PauseMitText "Taste drücken, um das Fenster zu schließen..."
+    call :PauseMitText "Taste druecken, um das Fenster zu schliessen..."
     exit /b
 )
 
@@ -25,52 +25,52 @@ set LOG=SystemCheck.log
 echo === Systemcheck gestartet: %DATE% %TIME% === > "%LOG%"
 
 echo =============================
-echo   Windows Systemprüfung
+echo   Windows Systempruefung
 echo =============================
 echo.
 
-echo [1/4] DISM: CheckHealth wird ausgeführt...
+echo [1/4] DISM: CheckHealth wird ausgefuehrt...
 Dism /Online /Cleanup-Image /CheckHealth >> "%LOG%" 2>&1
 if %errorlevel% neq 0 (
     echo Fehler bei CheckHealth. Details siehe "%LOG%".
-    call :PauseMitText "Taste drücken, um den Fehlerbericht zu sehen..."
+    call :PauseMitText "Taste druecken, um den Fehlerbericht zu sehen..."
     exit /b
 )
-call :PauseMitText "CheckHealth abgeschlossen. Taste drücken, um fortzufahren..."
+call :PauseMitText "CheckHealth abgeschlossen. Taste druecken, um fortzufahren..."
 
-echo [2/4] DISM: ScanHealth wird ausgeführt...
+echo [2/4] DISM: ScanHealth wird ausgefuehrt...
 Dism /Online /Cleanup-Image /ScanHealth >> "%LOG%" 2>&1
 if %errorlevel% neq 0 (
     echo Fehler bei ScanHealth. Details siehe "%LOG%".
-    call :PauseMitText "Taste drücken, um den Fehlerbericht zu sehen..."
+    call :PauseMitText "Taste druecken, um den Fehlerbericht zu sehen..."
     exit /b
 )
-call :PauseMitText "ScanHealth abgeschlossen. Taste drücken, um fortzufahren..."
+call :PauseMitText "ScanHealth abgeschlossen. Taste druecken, um fortzufahren..."
 
-echo [3/4] DISM: RestoreHealth wird ausgeführt...
+echo [3/4] DISM: RestoreHealth wird ausgefuehrt...
 Dism /Online /Cleanup-Image /RestoreHealth >> "%LOG%" 2>&1
 if %errorlevel% neq 0 (
     echo Fehler bei RestoreHealth. Details siehe "%LOG%".
-    call :PauseMitText "Taste drücken, um den Fehlerbericht zu sehen..."
+    call :PauseMitText "Taste druecken, um den Fehlerbericht zu sehen..."
     exit /b
 )
-call :PauseMitText "RestoreHealth abgeschlossen. Taste drücken, um fortzufahren..."
+call :PauseMitText "RestoreHealth abgeschlossen. Taste druecken, um fortzufahren..."
 
-echo [4/4] SFC: Systemdatei-Überprüfung wird ausgeführt...
+echo [4/4] SFC: Systemdatei-Ueberpruefung wird ausgefuehrt...
 sfc /scannow >> "%LOG%" 2>&1
 if %errorlevel% neq 0 (
     echo Fehler bei SFC. Details siehe "%LOG%".
-    call :PauseMitText "Taste drücken, um den Fehlerbericht zu sehen..."
+    call :PauseMitText "Taste druecken, um den Fehlerbericht zu sehen..."
     exit /b
 )
-call :PauseMitText "SFC abgeschlossen. Taste drücken, um zum Abschlussbericht zu gehen..."
+call :PauseMitText "SFC abgeschlossen. Taste druecken, um zum Abschlussbericht zu gehen..."
 
 echo =============================
 echo     Vorgang abgeschlossen
 echo =============================
 echo Siehe Logdatei: "%LOG%"
 echo.
-echo Letzte Einträge aus der Logdatei:
+echo Letzte Eintraege aus der Logdatei:
 type "%LOG%" | more
-call :PauseMitText "Taste drücken, um das Fenster zu schließen..."
+call :PauseMitText "Taste druecken, um das Fenster zu schliessen..."
 exit
