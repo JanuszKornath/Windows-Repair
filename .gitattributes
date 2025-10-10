@@ -1,0 +1,6 @@
+# Einheitliche Textcodierung und Zeilenenden
+* text=auto eol=lf
+
+# Batch-Dateien immer als UTF-8 ohne BOM behandeln
+*.bat text working-tree-encoding=UTF-8
+*.cmd text working-tree-encoding=UTF-8
