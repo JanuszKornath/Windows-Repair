@@ -1,15 +1,17 @@
 @echo off
+setlocal enabledelayedexpansion
 chcp 1252 >nul
 cd /d "%~dp0"
 title Systempruefung mit DISM und SFC
 color 1F
+goto :main
 
-:: Funktion fuer erklaerende Pause
 :PauseMitText
-echo %~1
+if not "%~1"=="" echo %~1
 pause >nul
 goto :eof
 
+:main
 :: Admin-Rechte pruefen
 fltmc >nul 2>&1
 if %errorlevel% neq 0 (
@@ -29,42 +31,26 @@ echo   Windows Systempruefung
 echo =============================
 echo.
 
+:: Fehlerüberwachung aktivieren
+set "FAIL=0"
+
 echo [1/4] DISM: CheckHealth wird ausgefuehrt...
-Dism /Online /Cleanup-Image /CheckHealth >> "%LOG%" 2>&1
-if %errorlevel% neq 0 (
-    echo Fehler bei CheckHealth. Details siehe "%LOG%".
-    call :PauseMitText "Taste druecken, um den Fehlerbericht zu sehen..."
-    exit /b
-)
-call :PauseMitText "CheckHealth abgeschlossen. Taste druecken, um fortzufahren..."
+Dism /Online /Cleanup-Image /CheckHealth >> "%LOG%" 2>&1 || set FAIL=1
+if !FAIL! neq 0 goto :Fehler
 
 echo [2/4] DISM: ScanHealth wird ausgefuehrt...
-Dism /Online /Cleanup-Image /ScanHealth >> "%LOG%" 2>&1
-if %errorlevel% neq 0 (
-    echo Fehler bei ScanHealth. Details siehe "%LOG%".
-    call :PauseMitText "Taste druecken, um den Fehlerbericht zu sehen..."
-    exit /b
-)
-call :PauseMitText "ScanHealth abgeschlossen. Taste druecken, um fortzufahren..."
+Dism /Online /Cleanup-Image /ScanHealth >> "%LOG%" 2>&1 || set FAIL=2
+if !FAIL! neq 0 goto :Fehler
 
 echo [3/4] DISM: RestoreHealth wird ausgefuehrt...
-Dism /Online /Cleanup-Image /RestoreHealth >> "%LOG%" 2>&1
-if %errorlevel% neq 0 (
-    echo Fehler bei RestoreHealth. Details siehe "%LOG%".
-    call :PauseMitText "Taste druecken, um den Fehlerbericht zu sehen..."
-    exit /b
-)
-call :PauseMitText "RestoreHealth abgeschlossen. Taste druecken, um fortzufahren..."
+Dism /Online /Cleanup-Image /RestoreHealth >> "%LOG%" 2>&1 || set FAIL=3
+if !FAIL! neq 0 goto :Fehler
 
 echo [4/4] SFC: Systemdatei-Ueberpruefung wird ausgefuehrt...
-sfc /scannow >> "%LOG%" 2>&1
-if %errorlevel% neq 0 (
-    echo Fehler bei SFC. Details siehe "%LOG%".
-    call :PauseMitText "Taste druecken, um den Fehlerbericht zu sehen..."
-    exit /b
-)
-call :PauseMitText "SFC abgeschlossen. Taste druecken, um zum Abschlussbericht zu gehen..."
+sfc /scannow >> "%LOG%" 2>&1 || set FAIL=4
+if !FAIL! neq 0 goto :Fehler
 
+:: Erfolgreicher Abschluss
 echo =============================
 echo     Vorgang abgeschlossen
 echo =============================
@@ -72,5 +58,14 @@ echo Siehe Logdatei: "%LOG%"
 echo.
 echo Letzte Eintraege aus der Logdatei:
 type "%LOG%" | more
+goto :Ende
+
+:Fehler
+color 0C
+echo [FEHLER] Schritt !FAIL! ist fehlgeschlagen. Siehe "%LOG%" fuer Details.
+color 1F
+goto :Ende
+
+:Ende
 call :PauseMitText "Taste druecken, um das Fenster zu schliessen..."
-exit
+exit /b
