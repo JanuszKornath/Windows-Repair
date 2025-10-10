@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 chcp 65001 >nul
 pushd %~dp0
 title Systemüberprüfung mit DISM und SFC
