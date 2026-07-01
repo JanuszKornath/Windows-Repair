@@ -22,7 +22,7 @@ if (-not (Test-Path $scriptPath)) {
 Write-Host "[...] Kompiliere '$scriptPath' zu EXE..." -ForegroundColor Cyan
 
 try {
-    Invoke-PS2EXE -InputFile $scriptPath -OutputFile $exePath -noConsole -noOutput -ErrorAction Stop
+    Invoke-PS2EXE -InputFile $scriptPath -OutputFile $exePath -noConsole -noOutput -requireAdmin -ErrorAction Stop
     Write-Host "[OK] EXE erfolgreich erstellt: $exePath" -ForegroundColor Green
 } catch {
     Write-Host "[X] Fehler beim Erstellen der EXE: $_" -ForegroundColor Red
