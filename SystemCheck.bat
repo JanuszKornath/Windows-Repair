@@ -38,25 +38,25 @@ echo.
 set "FAIL=0"
 
 echo [1/4] DISM: CheckHealth wird ausgeführt...
-powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /CheckHealth 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
+powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /CheckHealth 2>&1 | Where-Object { $_ -notmatch '^\s*\[=*\s*\d+(\.\d+)?%%=*\s*\]\s*$' } | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=1
 if !FAIL! neq 0 goto :Fehler
 echo CheckHealth abgeschlossen.
 
 echo [2/4] DISM: ScanHealth wird ausgeführt...
-powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /ScanHealth 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
+powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /ScanHealth 2>&1 | Where-Object { $_ -notmatch '^\s*\[=*\s*\d+(\.\d+)?%%=*\s*\]\s*$' } | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=2
 if !FAIL! neq 0 goto :Fehler
 echo ScanHealth abgeschlossen.
 
 echo [3/4] DISM: RestoreHealth wird ausgeführt...
-powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /RestoreHealth 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
+powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /RestoreHealth 2>&1 | Where-Object { $_ -notmatch '^\s*\[=*\s*\d+(\.\d+)?%%=*\s*\]\s*$' } | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=3
 if !FAIL! neq 0 goto :Fehler
 echo RestoreHealth abgeschlossen.
 
 echo [4/4] SFC: Systemdatei-Überprüfung wird ausgeführt...
-powershell -NoProfile -Command "& { sfc /scannow 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
+powershell -NoProfile -Command "& { sfc /scannow 2>&1 | Where-Object { $_ -notmatch '\d+\s*%%' } | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=4
 if !FAIL! neq 0 goto :Fehler
 echo SFC abgeschlossen.
