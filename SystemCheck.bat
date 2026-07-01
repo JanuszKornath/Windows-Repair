@@ -7,7 +7,7 @@ color 1F
 goto :main
 
 :: -------------------------------------
-:: Funktion fï¿½r erklï¿½rende Pausen
+:: Funktion für erklärende Pausen
 :PauseMitText
 if not "%~1"=="" echo %~1
 pause >nul
@@ -15,13 +15,13 @@ goto :eof
 :: -------------------------------------
 
 :main
-:: Admin-Rechte prï¿½fen
+:: Admin-Rechte prüfen
 fltmc >nul 2>&1
 if %errorlevel% neq 0 (
     color 0C
-    echo [FEHLER] Bitte als Administrator ausfï¿½hren!
+    echo [FEHLER] Bitte als Administrator ausführen!
     color 1F
-    call :PauseMitText "Taste drï¿½cken, um das Fenster zu schlieï¿½en..."
+    call :PauseMitText "Taste drücken, um das Fenster zu schließen..."
     exit /b
 )
 
@@ -30,32 +30,32 @@ set "LOG=%~dp0SystemCheck.log"
 echo === Systemcheck gestartet: %DATE% %TIME% === > "%LOG%"
 
 echo =============================
-echo   Windows Systemprï¿½fung
+echo   Windows Systemprüfung
 echo =============================
 echo.
 
-:: Fehlerï¿½berwachung aktivieren
+:: Fehlerüberwachung aktivieren
 set "FAIL=0"
 
-echo [1/4] DISM: CheckHealth wird ausgefï¿½hrt...
+echo [1/4] DISM: CheckHealth wird ausgeführt...
 powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /CheckHealth 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=1
 if !FAIL! neq 0 goto :Fehler
 echo CheckHealth abgeschlossen.
 
-echo [2/4] DISM: ScanHealth wird ausgefï¿½hrt...
+echo [2/4] DISM: ScanHealth wird ausgeführt...
 powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /ScanHealth 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=2
 if !FAIL! neq 0 goto :Fehler
 echo ScanHealth abgeschlossen.
 
-echo [3/4] DISM: RestoreHealth wird ausgefï¿½hrt...
+echo [3/4] DISM: RestoreHealth wird ausgeführt...
 powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /RestoreHealth 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=3
 if !FAIL! neq 0 goto :Fehler
 echo RestoreHealth abgeschlossen.
 
-echo [4/4] SFC: Systemdatei-ï¿½berprï¿½fung wird ausgefï¿½hrt...
+echo [4/4] SFC: Systemdatei-Überprüfung wird ausgeführt...
 powershell -NoProfile -Command "& { sfc /scannow 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=4
 if !FAIL! neq 0 goto :Fehler
@@ -67,16 +67,16 @@ echo     Vorgang abgeschlossen
 echo =============================
 echo Siehe Logdatei: "%LOG%"
 echo.
-echo Letzte Eintrï¿½ge aus der Logdatei:
+echo Letzte Einträge aus der Logdatei:
 type "%LOG%"
 goto :Ende
 
 :Fehler
 color 0C
-echo [FEHLER] Schritt !FAIL! ist fehlgeschlagen. Siehe "%LOG%" fï¿½r Details.
+echo [FEHLER] Schritt !FAIL! ist fehlgeschlagen. Siehe "%LOG%" für Details.
 color 1F
 goto :Ende
 
 :Ende
-call :PauseMitText "Taste drï¿½cken, um das Fenster zu schlieï¿½en..."
+call :PauseMitText "Taste drücken, um das Fenster zu schließen..."
 exit
