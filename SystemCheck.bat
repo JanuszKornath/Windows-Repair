@@ -29,9 +29,6 @@ if %errorlevel% neq 0 (
 set "LOG=%~dp0SystemCheck.log"
 echo === Systemcheck gestartet: %DATE% %TIME% === > "%LOG%"
 
-:: PowerShell-Tee vorbereiten
-set "TEE=powershell -NoProfile -Command \"$input | Tee-Object -FilePath '%LOG%' -Append\""
-
 echo =============================
 echo   Windows Systemprüfung
 echo =============================
@@ -41,25 +38,25 @@ echo.
 set "FAIL=0"
 
 echo [1/4] DISM: CheckHealth wird ausgeführt...
-Dism /Online /Cleanup-Image /CheckHealth | %TEE%
+powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /CheckHealth 2>&1 | Tee-Object -FilePath '%LOG%' -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=1
 if !FAIL! neq 0 goto :Fehler
 call :PauseMitText "CheckHealth abgeschlossen. Taste drücken, um fortzufahren..."
 
 echo [2/4] DISM: ScanHealth wird ausgeführt...
-Dism /Online /Cleanup-Image /ScanHealth | %TEE%
+powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /ScanHealth 2>&1 | Tee-Object -FilePath '%LOG%' -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=2
 if !FAIL! neq 0 goto :Fehler
 call :PauseMitText "ScanHealth abgeschlossen. Taste drücken, um fortzufahren..."
 
 echo [3/4] DISM: RestoreHealth wird ausgeführt...
-Dism /Online /Cleanup-Image /RestoreHealth | %TEE%
+powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /RestoreHealth 2>&1 | Tee-Object -FilePath '%LOG%' -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=3
 if !FAIL! neq 0 goto :Fehler
 call :PauseMitText "RestoreHealth abgeschlossen. Taste drücken, um fortzufahren..."
 
 echo [4/4] SFC: Systemdatei-Überprüfung wird ausgeführt...
-sfc /scannow | %TEE%
+powershell -NoProfile -Command "& { sfc /scannow 2>&1 | Tee-Object -FilePath '%LOG%' -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=4
 if !FAIL! neq 0 goto :Fehler
 call :PauseMitText "SFC abgeschlossen. Taste drücken, um zum Abschlussbericht zu gehen..."
