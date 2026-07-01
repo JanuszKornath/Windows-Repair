@@ -38,40 +38,61 @@ echo.
 set "FAIL=0"
 
 echo [1/4] DISM: CheckHealth wird ausgeführt...
-powershell -NoProfile -Command "& { $cr=[string][char]13; dism /Online /Cleanup-Image /CheckHealth 2>&1 | ForEach-Object { $l=[string]$_; $m=[regex]::Match($l,'(\d+([.,]\d+)?)\s*%%'); if($m.Success){ Write-Host -NoNewline ($cr + '  Fortschritt: ' + $m.Groups[1].Value + ' %%   ') } elseif($l.Trim().Length -gt 0){ Write-Host -NoNewline ($cr + (' ' * 60) + $cr); Write-Host $l; Add-Content -Path $env:LOG -Value $l } }; Write-Host; exit $LASTEXITCODE }"
-if %errorlevel% neq 0 set FAIL=1
-if !FAIL! neq 0 goto :Fehler
+echo [%TIME%] Schritt 1/4 (DISM CheckHealth) gestartet>> "%LOG%"
+dism /Online /Cleanup-Image /CheckHealth
+if !errorlevel! neq 0 (
+    set "FAIL=1"
+    goto :Fehler
+)
+echo [%TIME%] Schritt 1/4 (DISM CheckHealth): OK>> "%LOG%"
 echo CheckHealth abgeschlossen.
 
 echo [2/4] DISM: ScanHealth wird ausgeführt...
-powershell -NoProfile -Command "& { $cr=[string][char]13; dism /Online /Cleanup-Image /ScanHealth 2>&1 | ForEach-Object { $l=[string]$_; $m=[regex]::Match($l,'(\d+([.,]\d+)?)\s*%%'); if($m.Success){ Write-Host -NoNewline ($cr + '  Fortschritt: ' + $m.Groups[1].Value + ' %%   ') } elseif($l.Trim().Length -gt 0){ Write-Host -NoNewline ($cr + (' ' * 60) + $cr); Write-Host $l; Add-Content -Path $env:LOG -Value $l } }; Write-Host; exit $LASTEXITCODE }"
-if %errorlevel% neq 0 set FAIL=2
-if !FAIL! neq 0 goto :Fehler
+echo [%TIME%] Schritt 2/4 (DISM ScanHealth) gestartet>> "%LOG%"
+dism /Online /Cleanup-Image /ScanHealth
+if !errorlevel! neq 0 (
+    set "FAIL=2"
+    goto :Fehler
+)
+echo [%TIME%] Schritt 2/4 (DISM ScanHealth): OK>> "%LOG%"
 echo ScanHealth abgeschlossen.
 
 echo [3/4] DISM: RestoreHealth wird ausgeführt...
-powershell -NoProfile -Command "& { $cr=[string][char]13; dism /Online /Cleanup-Image /RestoreHealth 2>&1 | ForEach-Object { $l=[string]$_; $m=[regex]::Match($l,'(\d+([.,]\d+)?)\s*%%'); if($m.Success){ Write-Host -NoNewline ($cr + '  Fortschritt: ' + $m.Groups[1].Value + ' %%   ') } elseif($l.Trim().Length -gt 0){ Write-Host -NoNewline ($cr + (' ' * 60) + $cr); Write-Host $l; Add-Content -Path $env:LOG -Value $l } }; Write-Host; exit $LASTEXITCODE }"
-if %errorlevel% neq 0 set FAIL=3
-if !FAIL! neq 0 goto :Fehler
+echo [%TIME%] Schritt 3/4 (DISM RestoreHealth) gestartet>> "%LOG%"
+dism /Online /Cleanup-Image /RestoreHealth
+if !errorlevel! neq 0 (
+    set "FAIL=3"
+    goto :Fehler
+)
+echo [%TIME%] Schritt 3/4 (DISM RestoreHealth): OK>> "%LOG%"
 echo RestoreHealth abgeschlossen.
 
 echo [4/4] SFC: Systemdatei-Überprüfung wird ausgeführt...
-powershell -NoProfile -Command "& { $cr=[string][char]13; sfc /scannow 2>&1 | ForEach-Object { $l=[string]$_; $m=[regex]::Match($l,'(\d+([.,]\d+)?)\s*%%'); if($m.Success){ Write-Host -NoNewline ($cr + '  Fortschritt: ' + $m.Groups[1].Value + ' %%   ') } elseif($l.Trim().Length -gt 0){ Write-Host -NoNewline ($cr + (' ' * 60) + $cr); Write-Host $l; Add-Content -Path $env:LOG -Value $l } }; Write-Host; exit $LASTEXITCODE }"
-if %errorlevel% neq 0 set FAIL=4
-if !FAIL! neq 0 goto :Fehler
+echo [%TIME%] Schritt 4/4 (SFC) gestartet>> "%LOG%"
+sfc /scannow
+if !errorlevel! neq 0 (
+    set "FAIL=4"
+    goto :Fehler
+)
+echo [%TIME%] Schritt 4/4 (SFC): OK>> "%LOG%"
 echo SFC abgeschlossen.
 
 :: Erfolgreicher Abschluss
+echo === Systemcheck erfolgreich abgeschlossen: %DATE% %TIME% ===>> "%LOG%"
 echo =============================
 echo     Vorgang abgeschlossen
 echo =============================
 echo Siehe Logdatei: "%LOG%"
+echo Windows-Detailprotokolle:
+echo   %WINDIR%\Logs\DISM\dism.log
+echo   %WINDIR%\Logs\CBS\CBS.log
 echo.
 echo Letzte Einträge aus der Logdatei:
 type "%LOG%"
 goto :Ende
 
 :Fehler
+echo === FEHLER in Schritt !FAIL!: %DATE% %TIME% ===>> "%LOG%"
 color 0C
 echo [FEHLER] Schritt !FAIL! ist fehlgeschlagen. Siehe "%LOG%" für Details.
 color 1F
