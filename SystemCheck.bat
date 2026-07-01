@@ -40,32 +40,40 @@ set "FAIL=0"
 echo [1/4] DISM: CheckHealth wird ausgeführt...
 echo [%TIME%] Schritt 1/4 (DISM CheckHealth) gestartet>> "%LOG%"
 dism /Online /Cleanup-Image /CheckHealth
-if %errorlevel% neq 0 set FAIL=1
-if !FAIL! neq 0 goto :Fehler
+if !errorlevel! neq 0 (
+    set "FAIL=1"
+    goto :Fehler
+)
 echo [%TIME%] Schritt 1/4 (DISM CheckHealth): OK>> "%LOG%"
 echo CheckHealth abgeschlossen.
 
 echo [2/4] DISM: ScanHealth wird ausgeführt...
 echo [%TIME%] Schritt 2/4 (DISM ScanHealth) gestartet>> "%LOG%"
 dism /Online /Cleanup-Image /ScanHealth
-if %errorlevel% neq 0 set FAIL=2
-if !FAIL! neq 0 goto :Fehler
+if !errorlevel! neq 0 (
+    set "FAIL=2"
+    goto :Fehler
+)
 echo [%TIME%] Schritt 2/4 (DISM ScanHealth): OK>> "%LOG%"
 echo ScanHealth abgeschlossen.
 
 echo [3/4] DISM: RestoreHealth wird ausgeführt...
 echo [%TIME%] Schritt 3/4 (DISM RestoreHealth) gestartet>> "%LOG%"
 dism /Online /Cleanup-Image /RestoreHealth
-if %errorlevel% neq 0 set FAIL=3
-if !FAIL! neq 0 goto :Fehler
+if !errorlevel! neq 0 (
+    set "FAIL=3"
+    goto :Fehler
+)
 echo [%TIME%] Schritt 3/4 (DISM RestoreHealth): OK>> "%LOG%"
 echo RestoreHealth abgeschlossen.
 
 echo [4/4] SFC: Systemdatei-Überprüfung wird ausgeführt...
 echo [%TIME%] Schritt 4/4 (SFC) gestartet>> "%LOG%"
 sfc /scannow
-if %errorlevel% neq 0 set FAIL=4
-if !FAIL! neq 0 goto :Fehler
+if !errorlevel! neq 0 (
+    set "FAIL=4"
+    goto :Fehler
+)
 echo [%TIME%] Schritt 4/4 (SFC): OK>> "%LOG%"
 echo SFC abgeschlossen.
 
