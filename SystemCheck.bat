@@ -41,25 +41,25 @@ echo [1/4] DISM: CheckHealth wird ausgeführt...
 powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /CheckHealth 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=1
 if !FAIL! neq 0 goto :Fehler
-call :PauseMitText "CheckHealth abgeschlossen. Taste drücken, um fortzufahren..."
+echo CheckHealth abgeschlossen.
 
 echo [2/4] DISM: ScanHealth wird ausgeführt...
 powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /ScanHealth 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=2
 if !FAIL! neq 0 goto :Fehler
-call :PauseMitText "ScanHealth abgeschlossen. Taste drücken, um fortzufahren..."
+echo ScanHealth abgeschlossen.
 
 echo [3/4] DISM: RestoreHealth wird ausgeführt...
 powershell -NoProfile -Command "& { dism /Online /Cleanup-Image /RestoreHealth 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=3
 if !FAIL! neq 0 goto :Fehler
-call :PauseMitText "RestoreHealth abgeschlossen. Taste drücken, um fortzufahren..."
+echo RestoreHealth abgeschlossen.
 
 echo [4/4] SFC: Systemdatei-Überprüfung wird ausgeführt...
 powershell -NoProfile -Command "& { sfc /scannow 2>&1 | Tee-Object -FilePath $env:LOG -Append; exit $LASTEXITCODE }"
 if %errorlevel% neq 0 set FAIL=4
 if !FAIL! neq 0 goto :Fehler
-call :PauseMitText "SFC abgeschlossen. Taste drücken, um zum Abschlussbericht zu gehen..."
+echo SFC abgeschlossen.
 
 :: Erfolgreicher Abschluss
 echo =============================
@@ -68,7 +68,7 @@ echo =============================
 echo Siehe Logdatei: "%LOG%"
 echo.
 echo Letzte Einträge aus der Logdatei:
-type "%LOG%" | more
+type "%LOG%"
 goto :Ende
 
 :Fehler
